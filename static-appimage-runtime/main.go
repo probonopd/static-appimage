@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"runtime"
 	"syscall"
 	"time"
@@ -63,8 +64,24 @@ func main() {
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
+
 	argv0 := fmt.Sprintf("ARGV0=%s",os.Args[0])
-	cmd.Env = append(os.Environ(), argv0)
+	appdir := fmt.Sprintf("APPDIR=%s",mnt)
+	evalsym, errs := filepath.EvalSymlinks(os.Args[0])
+	if errs != nil {
+		evalsym=os.Args[0]
+	}
+	abs, erra:= filepath.Abs(evalsym)
+	if erra != nil {
+		abs=""
+	}
+	appimage := fmt.Sprintf("APPIMAGE=%s", abs)
+	currdir, errg := os.Getwd()
+	if errg != nil {
+		currdir=""
+	}
+	workdir := fmt.Sprintf("OWD=%s", currdir)
+	cmd.Env = append(os.Environ(), argv0, appdir, appimage, workdir)
 	err = cmd.Run()
 	if cmd.ProcessState != nil {
 		if waitStatus, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
