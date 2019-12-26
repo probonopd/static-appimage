@@ -63,6 +63,8 @@ func main() {
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
+	argv0 := fmt.Sprintf("ARGV0=%s",os.Args[0])
+	cmd.Env = append(os.Environ(), argv0)
 	err = cmd.Run()
 	if cmd.ProcessState != nil {
 		if waitStatus, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
