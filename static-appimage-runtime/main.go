@@ -19,21 +19,38 @@ import (
 )
 
 func main() {
+	debug := false
+	if len(os.Getenv("APPIMAGE_DEBUG"))>0 {
+		debug = true
+		fmt.Fprintf(os.Stderr, "[d] debug mode on\n")
+	}
 	executable, err := osext.Executable()
 	e.Exit(err)
+	if debug {
+		fmt.Fprintf(os.Stderr, "[d] executable: %s\n", executable)
+	}
 	files, err := zipfs.NewZipTree(executable)
 	e.Exit(err)
 
 	mfs := zipfs.NewMemTreeFs(files)
 	mfs.Name = fmt.Sprintf("fs(%s)", os.Args[0])
 
+	if debug {
+		fmt.Fprintf(os.Stderr, "[d] mfs.Name: %s\n", os.Args[0])
+	}
+
 	opts := &nodefs.Options{
 		AttrTimeout:  10 * time.Second,
 		EntryTimeout: 10 * time.Second,
+		Debug:        debug,
 	}
 
 	mnt, err := ioutil.TempDir("", ".mount_")
 	e.Exit(err)
+
+	if debug {
+		fmt.Fprintf(os.Stderr, "[d] mnt: %s\n", mnt)
+	}
 
 	server, _, err := nodefs.MountRoot(mnt, mfs.Root(), opts)
 	e.Exit(err)
@@ -46,6 +63,9 @@ func main() {
 		signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 		<-signals
 
+		if debug {
+			fmt.Fprintf(os.Stderr, "[d] Received signal for mnt: %s\n", mnt)
+		}
 		err = server.Unmount()
 		e.Exit(err)
 		err = os.Remove(mnt)
@@ -53,6 +73,10 @@ func main() {
 
 		os.Exit(exitCode)
 	}()
+
+	if debug {
+		fmt.Fprintf(os.Stderr, "[d] Waiting for mount\n")
+	}
 
 	err = server.WaitMount()
 	e.Exit(err)
@@ -82,6 +106,9 @@ func main() {
 	}
 	workdir := fmt.Sprintf("OWD=%s", currdir)
 	cmd.Env = append(os.Environ(), argv0, appdir, appimage, workdir)
+	if debug {
+		fmt.Fprintf(os.Stderr, "[d] Running executable: %s with %s (wd: %s)", os.Args[0], abs, workdir)
+	}
 	err = cmd.Run()
 	if cmd.ProcessState != nil {
 		if waitStatus, ok := cmd.ProcessState.Sys().(syscall.WaitStatus); ok {
