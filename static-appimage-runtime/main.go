@@ -12,8 +12,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hanwen/go-fuse/fuse/nodefs"
-	"github.com/hanwen/go-fuse/zipfs"
+	"github.com/hanwen/go-fuse/v2/zipfs"
+	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/kardianos/osext"
 	"github.com/orivej/e"
 )
@@ -29,30 +29,24 @@ func main() {
 	if debug {
 		fmt.Fprintf(os.Stderr, "[d] executable: %s\n", executable)
 	}
-	files, err := zipfs.NewZipTree(executable)
+	root, err := zipfs.NewZipTree(executable)
 	e.Exit(err)
-
-	mfs := zipfs.NewMemTreeFs(files)
-	mfs.Name = fmt.Sprintf("fs(%s)", os.Args[0])
-
-	if debug {
-		fmt.Fprintf(os.Stderr, "[d] mfs.Name: %s\n", os.Args[0])
-	}
-
-	opts := &nodefs.Options{
-		AttrTimeout:  10 * time.Second,
-		EntryTimeout: 10 * time.Second,
-		Debug:        debug,
-	}
 
 	mnt, err := ioutil.TempDir("", ".mount_")
 	e.Exit(err)
 
 	if debug {
-		fmt.Fprintf(os.Stderr, "[d] mnt: %s\n", mnt)
+        	fmt.Fprintf(os.Stderr, "[d] mnt: %s\n", mnt)
 	}
 
-	server, _, err := nodefs.MountRoot(mnt, mfs.Root(), opts)
+	ttl := 10 * time.Second
+	ttlp := &ttl
+	opts := &fs.Options{
+		AttrTimeout:  ttlp,
+		EntryTimeout: ttlp,
+	}
+	opts.Debug = debug
+	server, err := fs.Mount(mnt, root, opts)
 	e.Exit(err)
 
 	go server.Serve()
