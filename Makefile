@@ -33,5 +33,6 @@ gox:
 draft:
 	ghr -draft v$(VERSION) dist/
 
-
+rel:
+	ghr v$(VERSION) dist/
 
