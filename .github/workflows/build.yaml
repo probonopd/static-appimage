@@ -38,12 +38,12 @@ jobs:
            cd make-static-appimage
            # go mod init
            go get -u ./...
-           CGO_ENABLED=0 go build -ldflags="-s -w" -output="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
+           CGO_ENABLED=0 go build -ldflags="-s -w" -o="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
            cd ..
            cd static-appimage-runtime
            # go mod init
            go get -u ./...
-           CGO_ENABLED=0 go build -ldflags="-s -w" -output="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
+           CGO_ENABLED=0 go build -ldflags="-s -w" -o="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
            cd ..
 
     - name: Upload to releases
