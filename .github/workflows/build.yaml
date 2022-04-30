@@ -35,6 +35,8 @@ jobs:
       env:
         ARCHITECTURE: ${{ matrix.arch }}
       run: |
+           set -x
+           set -e
            cd make-static-appimage
            # go mod init
            go get -u ./...
