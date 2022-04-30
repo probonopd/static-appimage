@@ -5,7 +5,7 @@ This is a barebones alternative [AppImage](https://github.com/probonopd/AppImage
 # Usage
 
 ```sh
-go get github.com/orivej/static-appimage/...
+go get github.com/probonopd/static-appimage/...
 make-static-appimage APPDIR DESTINATION
 ```
 
