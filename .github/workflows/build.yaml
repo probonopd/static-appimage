@@ -36,12 +36,12 @@ jobs:
         ARCHITECTURE: ${{ matrix.arch }}
       run: |
            cd make-static-appimage
-           go mod init
+           # go mod init
            go get -u ./...
            CGO_ENABLED=0 gox -ldflags="-s -w" -output="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
            cd ..
            cd static-appimage-runtime
-           go mod init
+           # go mod init
            go get -u ./...
            CGO_ENABLED=0 gox -ldflags="-s -w" -output="../dist/{{.Dir}}_{{.OS}}_{{.Arch}}"
            cd ..
