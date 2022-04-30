@@ -51,7 +51,8 @@ jobs:
            CGO_ENABLED=0 go build -ldflags="-s -w" -o="../dist/static-appimage-runtime_${{ matrix.arch }}"
            mkdir make-static-appimage.AppDir
            cp "../dist/static-appimage-runtime_${{ matrix.arch }}" make-static-appimage.AppDir/AppRun
-           "../dist/make-static-appimage_${{ matrix.arch }}" make-static-appimage.AppDir "../dist/make-static-appimage_${{ matrix.arch }}.AppImage"
+           cp "../dist/static-appimage-runtime_${{ matrix.arch }}" static-appimage-runtime
+           PATH=.:$PATH "../dist/make-static-appimage_${{ matrix.arch }}" make-static-appimage.AppDir "../dist/make-static-appimage_${{ matrix.arch }}.AppImage"
            EOF
            cd ..
 
